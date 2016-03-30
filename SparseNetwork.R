@@ -135,3 +135,55 @@ colorsSC1 <- ifelse(testGraph==1,'red','blue')
 
 # On vérifie graphiquement que le clustering est parfait
 plotGraph(Graph,colorsSC1)
+
+
+
+
+
+##### ÉTAPE 5 - Méthode de Guédon and Vershynin (2015) #####
+
+
+# Dans leur article, Guédon and Vershynin (2015) présentent une méthode flexible pour prouver 
+# la précision de certains problèmes d'optimisation SDP pour la résolution de problèmes 
+# stochastiques variés. La méthode, basée notamment sur l'inégalité de Grothendieck et sur une
+# déviation en cut-norm, est générale. Nous l'appliquons ici au problème de détection 
+# de communautés, notamment au sein de réseaux parcimonieux.
+
+
+# Méthode de Guédon and Vershynin
+# --> A désigne la matrice (dense) d'adjacence du graphe
+
+comDetect <- function(A) {
+  
+  # Scalaire lambda du problème SDP
+  lambda <- mean(colSums(A))
+  
+  # Résolution du problème SDP, grâce au package Rcsdp et surtout la fonction csdp()
+  # (Formulation du problème primal via la trace, cf la documentation du package)
+  C <- list(list(diag(nrow(A)))) ; X <- list(A-lambda)
+  n <- nrow(A)
+  Z <- csdp(X,C,n,list(type=c("s"),size=n))$X[[1]]
+  
+  # Décomposition spectral de Z
+  # Calcul du vecteur propre associé à la plus grande valeur propre
+  xHat <- eigen(Z)$vectors[,1]
+  
+  # Clustering
+  community <- sign(xHat)
+
+  # Retour des résultats
+  return(community)
+  
+}
+
+
+# Application au graphe précédent
+
+A <- as.matrix(get.adjacency(Graph))
+testGraph <- comDetect(A)
+
+# Code couleur en fonction des prédictions de communautés
+colorsCD1 <- ifelse(testGraph==1,'red','blue')
+
+# On vérifie graphiquement que le clustering est parfait
+plotGraph(Graph,colorsCD1)
