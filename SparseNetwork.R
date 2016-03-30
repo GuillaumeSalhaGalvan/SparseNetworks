@@ -2,7 +2,7 @@
 #####    RÉSEAUX PARCIMONIEUX ET DÉTECTION DE COMMUNAUTÉS    #####
 #####              Projet de Compressed Sensing              #####
 #####            Gautier APPERT & Guillaume SALHA            #####
-#####               ENSAE ParisTech - Mars 2016              #####
+#####               ENSAE ParisTech - Avril 2016              #####
 ##################################################################
 
 
