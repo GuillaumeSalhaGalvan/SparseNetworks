@@ -187,3 +187,72 @@ colorsCD1 <- ifelse(testGraph==1,'red','blue')
 
 # On vérifie graphiquement que le clustering est parfait
 plotGraph(Graph,colorsCD1)
+
+
+
+
+
+
+##### ÉTAPE 6 - Automatisation du calcul du taux de bonne reconstitution des communautés #####
+
+
+# --> Pred désigne les prédictions entrées (vecteur de 'red' ou 'blue')
+computeAccuracy <- function(Pred){
+  
+  n <- length(Pred)
+  trueLabels <- c(rep('blue',n/2), rep('red',n/2))
+  
+  # Calcul du taux de bonnes prédictions
+  accuracy <- max(table(trueLabels==Pred))/n
+  
+  # Retour des résultats
+  return(accuracy)
+}
+
+
+
+
+
+##### ÉTAPE 7 - Réseaux parcimonieux et détection de communautés #####
+
+# Désormais, nous créons une fonction qui va nous permettre de comparer l'efficacité des 
+# deux méthodes créées précédemment. Pour des paramètres spécifiés en argument :
+# 1) nous générons N graphes du SBM G(n,p,q)
+# 2) nous tentons de reconstruire les communautés pour chaque graphe, avec les deux méthodes :
+#     - clustering spectral
+#     - méthode de Guédon et Vershynin
+# 3) nous renvoyons les taux de bonne prédiction moyens et les écarts-types
+# (approche Monte Carlo)
+
+
+monteCarloAnalysis <- function(N, n, p, q){
+  
+  # Création de vecteurs pour stocker les résultats
+  scoreSC <- rep(0,N) ; scoreCD <- rep(0,N)
+  
+  # Boucle Monte Carlo
+  for(i in 1:N){
+    
+    # Stochastic Block Model
+    G <- sample_sbm(n=n, pref.matrix=matrix(c(p,q,q,p),2,2), block.sizes=c(n/2,n/2))
+    
+    # Récupération de la matrice d'adjacence
+    A <- as.matrix(get.adjacency(G))
+    
+    # Détection de communautés via les deux méthodes
+    testG <- comDetect(A) ; colorsCD <- ifelse(testG==1,'red','blue')
+    testG2 <- spectralClustering(A) ; colorsSC <- ifelse(testG2==1, 'red', 'blue')
+    
+    # Stockage des résultats
+    scoreSC[i] <- computeAccuracy(colorsSC)
+    scoreCD[i] <- computeAccuracy(colorsCD)
+    message("************** Loop : ", i, " *************" )
+  }
+  
+  # Retour des résultats
+  message("Précision moyenne Clustering Spectral : ", mean(scoreSC))
+  message("Écart-type : ", sd(scoreSC))
+  message("Précision moyenne Méthode de Guédon and Vershynin : ", mean(scoreCD))
+  message("Écart-type : ", sd(scoreCD))
+  c( mean(scoreSC), sd(scoreSC),mean(scoreCD), sd(scoreCD) )
+}
