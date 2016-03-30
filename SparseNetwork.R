@@ -94,3 +94,44 @@ Graph2 <- sample_sbm(n=200, pref.matrix=matrix(c(0.03,0.005,0.005,0.03),2,2), bl
 plotGraph(Graph2,Labels)
 
 
+
+
+
+##### ÉTAPE 4 - Clustering Spectral #####
+
+
+# Algorithme de Clustering Spectral dans le cadre de la recherche de deux communautés
+# (k-means sur le second vecteur propre) et sur le Laplacien non-normalisé du graphe
+# --> A désigne la matrice (dense) d'adjacence du graphe
+
+spectralClustering <- function(A){
+  
+  # Matrice des degrés
+  D <- diag(rowSums(A))
+  
+  # Laplacien
+  L <- D - A
+  
+  # Décomposition spectrale de L
+  # et calcul du second vecteur propre
+  eigenDecomp <- eigen(L)
+  vect <- eigenDecomp$vectors[,nrow(L)-1]
+  
+  # Clustering
+  community <- sign(vect)
+  
+  # Retour des résultats
+  return(community)
+}
+
+
+# Application au graphe précédent
+
+A <- as.matrix(get.adjacency(Graph))
+testGraph <- spectralClustering(A)
+
+# Code couleur en fonction des prédictions de communautés
+colorsSC1 <- ifelse(testGraph==1,'red','blue')
+
+# On vérifie graphiquement que le clustering est parfait
+plotGraph(Graph,colorsSC1)
