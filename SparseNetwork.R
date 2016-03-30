@@ -90,6 +90,7 @@ Labels <- c(rep("red",100),rep("blue",100))
 plotGraph(Graph,Labels)
 
 # Un graphe un peu moins "dense"
-Graph2 <- sample_sbm(n=200, pref.matrix=matrix(c(0.01,0.005,0.005,0.01),2,2), block.sizes=c(100,100))
+Graph2 <- sample_sbm(n=200, pref.matrix=matrix(c(0.03,0.005,0.005,0.03),2,2), block.sizes=c(100,100))
 plotGraph(Graph2,Labels)
+
 
