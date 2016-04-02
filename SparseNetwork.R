@@ -211,6 +211,24 @@ computeAccuracy <- function(Pred){
 
 
 
+##### ÉTAPE 6 - Automatisation du calcul du taux de bonne reconstitution des communautés #####
+
+
+# --> Pred désigne les prédictions entrées (vecteur de 'red' ou 'blue')
+computeAccuracy <- function(Pred){
+  
+  n <- length(Pred)
+  trueLabels <- c(rep('blue',n/2), rep('red',n/2))
+  
+  # Calcul du taux de bonnes prédictions
+  accuracy <- max(table(trueLabels==Pred))/n
+  
+  # Retour des résultats
+  return(accuracy)
+}
+
+
+
 
 
 ##### ÉTAPE 7 - Réseaux parcimonieux et détection de communautés #####
@@ -256,3 +274,33 @@ monteCarloAnalysis <- function(N, n, p, q){
   message("Écart-type : ", sd(scoreCD))
   c( mean(scoreSC), sd(scoreSC),mean(scoreCD), sd(scoreCD) )
 }
+
+
+
+# Quelques exemples d'application (voir rapport)
+
+
+A <- monteCarloAnalysis(100,200,0.3,0.05)
+
+B <- monteCarloAnalysis(100,1000,0.03,0.001)
+
+C <- monteCarloAnalysis(100,1000,0.005,0.0005)
+
+
+
+
+
+
+##### ÉTAPE 8 - General Stochastic Block Models #####
+
+
+# Code pour visualiser la génération d'un graphe à 4 communautés
+# à partir d'un General Stochastic Block Model
+
+probaMatrix <- matrix(0.005,4,4)
+diag(probaMatrix) <- rep(0.3,4)
+G1 <- sample_sbm(n=200, pref.matrix=probaMatrix, block.sizes=c(50,50,50,50))
+
+Labels <- c(rep("red",50),rep("blue",50),rep("yellow",50),rep("green",50))
+
+plotGraph(G1,Labels)
